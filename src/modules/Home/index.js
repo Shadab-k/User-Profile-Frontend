@@ -66,19 +66,10 @@ const Home = () => {
           </div>
         )}
       </div>
-
-      
       <button className="btn btn-danger" onClick={onLogout} type="button">
         Logout
       </button>
-
-      {/* <button className="btn btn-danger my-4" type="button">
-        Upload Image
-      </button> */}
-
-
     </>
   );
 };
-
 export default Home;
