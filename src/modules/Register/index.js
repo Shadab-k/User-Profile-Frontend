@@ -23,7 +23,7 @@ const Register = () => {
             const formData = new FormData();
         formData.append('name', 'saad');
         formData.append('testImage', credentials.profilePicture);
-            console.log("ss",formData)
+        formData.append('username', credentials.name);
 
             const uploadResponse = await fetch('http://localhost:5000/api/profile/photo', {
                 method: 'POST',
@@ -33,7 +33,6 @@ const Register = () => {
                 body: formData
                 
             });
-            console.log("saad",formData)
 
             if (!uploadResponse.ok) {
                 throw new Error('Image upload failed');
@@ -53,7 +52,6 @@ const Register = () => {
                 password: credentials.password
             }
 
-            console.log("azeem",registerFormData)
             const registerResponse = await axios.post('http://localhost:5000/api/register',{
                 ...registerFormData
             })
@@ -75,19 +73,10 @@ const Register = () => {
 
 
     const onChange = (e) => {
-    
-            
-     
-            setCredentials({ ...credentials, [e.target.name]: e.target.value });
-        
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
     };
     const onchangePP = (e) => {
-      
-            console.log(e);
-            console.log("sak",e.target.files[0].name);
-            setCredentials({ ...credentials, profilePicture: e.target.files[0]});
-            console.log("saad",credentials.profilePicture)
-       
+        setCredentials({ ...credentials, profilePicture: e.target.files[0] });
     };
 
     return (
