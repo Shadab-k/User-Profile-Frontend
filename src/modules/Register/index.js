@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import './style.css';
 import assets from '../../utils/assets';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Register = () => {
+    const { token } = useSelector((state) => state.AuthSlice);
+
     const [credentials, setCredentials] = useState({ name: '', email: '', password: '', profilePicture: null });
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -13,37 +16,78 @@ const Register = () => {
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
+
+            // Upload the profile picture first
+            
+           
             const formData = new FormData();
-            formData.append('name', credentials.name);
-            formData.append('email', credentials.email);
-            formData.append('password', credentials.password);
-            formData.append('profilePicture', credentials.profilePicture);
+        formData.append('name', 'saad');
+        formData.append('testImage', credentials.profilePicture);
+            console.log("ss",formData)
 
-            const response = await fetch('http://localhost:5000/api/register', {
+            const uploadResponse = await fetch('http://localhost:5000/api/profile/photo', {
                 method: 'POST',
-                body: formData,
+                
+                   
+                  
+                body: formData
+                
             });
+            console.log("saad",formData)
 
-            const json = await response.json();
-            console.log('json', json);
-            if (json.success) {
-                dispatch({ type: "Auth/SET_TOKEN", payload: json.authToken });
+            if (!uploadResponse.ok) {
+                throw new Error('Image upload failed');
+            }else{
+                console.log("success",uploadResponse);
+            }
+
+            // Once the image is uploaded successfully, proceed with user registration
+            // const registerFormData = new FormData();
+            // registerFormData.append('name', credentials.name);
+            // registerFormData.append('email', credentials.email);
+            // registerFormData.append('password', credentials.password);
+
+            const registerFormData={
+                name: credentials.name,
+                email: credentials.email,
+                password: credentials.password
+            }
+
+            console.log("azeem",registerFormData)
+            const registerResponse = await axios.post('http://localhost:5000/api/register',{
+                ...registerFormData
+            })
+            console.log("Register Response", registerResponse)
+            if (registerResponse.data.success) {
+                // User registration successful
+                dispatch({ type: "Auth/SET_TOKEN", payload: registerResponse.data.authToken });
                 navigate('/');
                 console.log('Account Created Successfully');
-            } else {
-                alert('Error Occurred While Creating the Account');
+            }
+            else {
+                console.log('Unable to register user')
             }
         } catch (error) {
-            alert('Invalid Credentials', error);
+            console.error('Error:', error);
+            alert('Error occurred:', error.message);
         }
     };
 
+
     const onChange = (e) => {
-        if (e.target.name === 'profilePicture') {
-            setCredentials({ ...credentials, profilePicture: e.target.files[0] });
-        } else {
+    
+            
+     
             setCredentials({ ...credentials, [e.target.name]: e.target.value });
-        }
+        
+    };
+    const onchangePP = (e) => {
+      
+            console.log(e);
+            console.log("sak",e.target.files[0].name);
+            setCredentials({ ...credentials, profilePicture: e.target.files[0]});
+            console.log("saad",credentials.profilePicture)
+       
     };
 
     return (
@@ -102,17 +146,18 @@ const Register = () => {
                             type="file"
                             id="formFile"
                             name="profilePicture"
-                            onChange={onChange}
+                            onChange={onchangePP}
                         />
                     </div>
 
                     <button className="btn btn-primary w-100 py-2" type="submit">
                         Sign in
                     </button>
-                    <Link to='/'>   <button className="btn btn-success w-10 my-3 " type="submit"> LogIN Page
-                 
-                </button> </Link>
-                   
+                    <Link to='/'>
+                        <button className="btn btn-success w-100 my-3 " type="button">
+                            LogIN Page
+                        </button>
+                    </Link>
 
                     <p className="mt-5 mb-3 text-body-secondary">© 2017–2024</p>
                 </form>
